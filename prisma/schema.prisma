@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+
+  // Referencia do cartão
+  cards Card[]
+  usersForCard UsersForCard[]
+
+  @@map("users")
+}
+
+model Card {
+  id String @id @default(uuid())
+  name String
+  finalNumberCard String @unique
+  flag String
+  color String
+  owner String
+
+  usersForCard UsersForCard[]
+
+  // Referencia do usuario
+  userId String // Chave estrangeira
+  user User @relation(fields: [userId], references: [id]) // Relacionamento com usuario
+
+  @@map("card")
+}
+
+model UsersForCard {
+  id String @id @default(uuid())
+
+  // Referencia do usuario
+  userId String // Chave estrangeira
+  user User @relation(fields: [userId], references: [id]) // Relacionamento com usuario
+
+  cardId String
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@map("users_for_card")
+}
